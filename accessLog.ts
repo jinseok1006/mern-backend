@@ -6,7 +6,8 @@ const excludedUrl = [/^\/access-log/, /^\/favicon.ico/];
 export default async function accessLog(req: Request, res: Response, next: NextFunction) {
   const accessLog: IAccessLog = {
     method: req.method,
-    ipAddress: req.ip,
+    ipAddress:
+      process.env.NODE_ENV === 'production' ? req.header('X-Forwarded-For') || req.ip : req.ip,
     path: req.originalUrl,
     timestamp: new Date(),
   };
