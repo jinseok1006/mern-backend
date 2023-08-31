@@ -1,7 +1,9 @@
 import { Schema, Types, model } from 'mongoose';
 
+type BoardType = '자유게시판';
+
 export interface IBoard {
-  type: string;
+  type: BoardType;
   next_id: number;
 }
 
