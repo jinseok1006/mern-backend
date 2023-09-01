@@ -1,30 +1,13 @@
 import express, { Request, Response } from 'express';
-import AccessLogModel from './models/accessLog';
-
-import {
-  getPosts,
-  createPost,
-  getPost,
-  modifyPost,
-  deletePost,
-  authenticatePost,
-  invalidPost,
-} from './board.controller';
-import PostModel from './models/post';
+import postRouter from './post';
+import AccessLogModel from '../models/accessLog';
 
 const router = express.Router();
 router.get('/', (req, res) => {
   res.status(403).end();
 });
 
-const postRouter = express.Router();
-
 router.use('/posts', postRouter);
-
-postRouter.route('/').get(getPosts).post(createPost);
-
-postRouter.route('/:id').all(invalidPost).get(getPost).put(modifyPost).delete(deletePost);
-postRouter.route('/:id/auth').post(authenticatePost);
 
 const getAccessLog = async (req: Request, res: Response) => {
   const accessLogsPerPage = 35;
@@ -58,6 +41,11 @@ const getAccessLog = async (req: Request, res: Response) => {
   }
 };
 
+const getRobotsTxt = (req: Request, res: Response) => {
+  res.set('Content-Type', 'text/plain').send('User-agent: *\nDisallow: /');
+};
+
 router.get('/access-log', getAccessLog);
+router.get('/robots.txt', getRobotsTxt);
 
 export default router;

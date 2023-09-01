@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import BoardModel, { IBoard } from './models/board';
-import PostModel, { IPost } from './models/post';
+import BoardModel, { IBoard } from '../models/board';
+import PostModel, { IPost } from '../models/post';
 
 export function invalidPost(req: Request, res: Response, next: NextFunction) {
   console.log('invaliPost 거쳐감');
   const postId = parseInt(req.params.id);
   if (isNaN(postId))
-    return res.status(400).json({ message: 'invalid post id', use: 'invalidPost middleware' });
+    return res
+      .status(400)
+      .json({ message: 'invalid post id', use: 'invalidPost middleware' });
   return next();
 }
 
@@ -14,12 +16,15 @@ export const deletePost = async (req: Request, res: Response) => {
   const postId = parseInt(req.params.id!);
   const { allowedPost } = req.session;
   if (allowedPost !== postId) {
-    return res.status(403).json({ message: `no permission for post ${postId}.` });
+    return res
+      .status(403)
+      .json({ message: `no permission for post ${postId}.` });
   }
 
   try {
     const deleted = await PostModel.deleteOne({ id: postId });
-    if (!deleted) return res.status(404).json({ message: `Post ${postId} not found.` });
+    if (!deleted)
+      return res.status(404).json({ message: `Post ${postId} not found.` });
     return res.json({ postId, message: 'deleted successfully.' });
   } catch (err) {
     return res.status(500).json(err);
@@ -31,9 +36,12 @@ export const modifyPost = async (req: Request, res: Response) => {
   const { title, content } = req.body;
   const { allowedPost } = req.session;
 
-  if (!title || !content) return res.status(400).json({ message: '필드가 부족합니다.' });
+  if (!title || !content)
+    return res.status(400).json({ message: '필드가 부족합니다.' });
   if (allowedPost !== postId)
-    return res.status(402).json({ message: `no permission for post ${postId}` });
+    return res
+      .status(402)
+      .json({ message: `no permission for post ${postId}` });
 
   try {
     const updated = await PostModel.findOneAndUpdate(
@@ -42,7 +50,8 @@ export const modifyPost = async (req: Request, res: Response) => {
       { $new: true, projection: { __v: false, _id: false } }
     );
 
-    if (!updated) return res.status(404).json({ message: `Post ${postId} not found.` });
+    if (!updated)
+      return res.status(404).json({ message: `Post ${postId} not found.` });
     return res.json({ message: 'updated successfully.' });
   } catch (err) {
     return res.status(500).json(err);
@@ -116,7 +125,8 @@ export const authenticatePost = async (req: Request, res: Response) => {
   const postId = parseInt(req.params.id!);
   const password = req.body.password;
 
-  if (isNaN(postId)) return res.status(400).json({ message: 'invalid post id.' });
+  if (isNaN(postId))
+    return res.status(400).json({ message: 'invalid post id.' });
   try {
     const post = await PostModel.findOne({ id: postId });
     if (!post) return res.status(404).json({ message: 'there is no a post.' });
@@ -124,7 +134,9 @@ export const authenticatePost = async (req: Request, res: Response) => {
     console.log(password, post.password);
 
     if (post.password !== password)
-      return res.status(401).json({ message: 'mismatch of password for post.' });
+      return res
+        .status(401)
+        .json({ message: 'mismatch of password for post.' });
 
     req.session.allowedPost = postId;
     res.json({ allowedPost: postId });

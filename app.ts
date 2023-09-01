@@ -8,7 +8,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: [/https?:\/\/localhost:[0-9]{4,5}\/?/, /https?:\/\/(.*\.)?jinseok.store\/?/],
+    origin: [
+      /https?:\/\/localhost:[0-9]{4,5}\/?/,
+      /https?:\/\/(.*\.)?jinseok.store\/?/,
+    ],
     credentials: true,
   })
 );
@@ -16,9 +19,10 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(accessLog);
+
 app.use(
   session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     resave: false,
   })
